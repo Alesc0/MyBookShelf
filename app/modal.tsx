@@ -1,19 +1,66 @@
-import { StatusBar } from 'expo-status-bar';
-import { Platform } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Box } from '@/components/ui/box';
+import {
+  Modal,
+  ModalBackdrop,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  ModalFooter,
+} from '@/components/ui/modal';
+import { Button, ButtonText } from '@/components/ui/button';
+import { Heading } from '@/components/ui/heading';
 import { Text } from '@/components/ui/text';
+import { Icon, CloseIcon } from '@/components/ui/icon';
+import React from 'react';
+import { addBook } from '@/db/books';
 
-export default function ModalScreen() {
+type Props = {
+  isOpen: boolean;
+  onClose?: () => void;
+  setShowModal: (set: boolean) => void;
+  size?: 'sm' | 'md' | 'lg' | 'xs' | 'full';
+};
+
+export default function AppModal({ isOpen, onClose, setShowModal, size = 'md' }: Props) {
   return (
-    <Box className=" flex flex-1 items-center justify-center">
-      <Text className="text-xl font-bold">Modal</Text>
-      <Box className="my-[30px] h-1 w-[80%]" />
-      <EditScreenInfo path="app/modal.tsx" />
-
-      {/* Use a light status bar on iOS to account for the black space above the modal */}
-      <StatusBar style={Platform.OS === 'ios' ? 'light' : 'auto'} />
-    </Box>
+    <Modal
+      isOpen={isOpen}
+      onClose={() => {
+        onClose?.();
+      }}
+      size={size}
+    >
+      <ModalBackdrop />
+      <ModalContent>
+        <ModalHeader>
+          <Heading size="lg">Modal Title</Heading>
+          <ModalCloseButton onPress={() => setShowModal(false)}>
+            <Icon as={CloseIcon} />
+          </ModalCloseButton>
+        </ModalHeader>
+        <ModalBody>
+          <Text>This is the modal body. You can add any content here.</Text>
+        </ModalBody>
+        <ModalFooter>
+          <Button
+            variant="outline"
+            action="secondary"
+            className="mr-3"
+            onPress={() => {
+              onClose?.();
+            }}
+          >
+            <ButtonText>Cancel</ButtonText>
+          </Button>
+          <Button
+            onPress={() => {
+              addBook()
+            }}
+          >
+            <ButtonText>Save</ButtonText>
+          </Button>
+        </ModalFooter>
+      </ModalContent>
+    </Modal>
   );
 }
