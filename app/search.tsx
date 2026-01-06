@@ -1,49 +1,25 @@
 import BookGrid from '@/components/BookGrid';
 import FabMenu from '@/components/Menu';
+import make_req from '@/components/requests';
 import { SearchBar } from '@/components/SearchBar';
 import { Text } from '@/components/Themed';
+import { OLBook_Search } from '@/components/types';
 import { Box } from '@/components/ui/box';
 import { useLocalSearchParams } from 'expo-router';
 import React, { useState, useEffect } from 'react';
 import { ScrollView } from 'react-native';
 
-export type OLBook_Search = {
-  author_key?: string[];
-  author_name?: string[];
-  cover_edition_key?: string;
-  cover_i?: number;
-  ebook_access?: string;
-  edition_count?: number;
-  first_publish_year?: number;
-  has_fulltext?: boolean;
-  ia?: string[];
-  ia_collection_s?: string;
-  key?: string;
-  language?: string[];
-  lending_edition_s?: string;
-  lending_identifier_s?: string;
-  public_scan_b?: boolean;
-  title?: string;
-};
-
-
-export default function Home() {
+export default function Search() {
   const [books, setBooks] = useState<OLBook_Search[]>([]);
   const params = useLocalSearchParams<{ query?: string }>();
 
   useEffect(() => {
-    const encodedQuery = encodeURIComponent(params.query ?? '');
-    fetch('https://openlibrary.org/search.json?title=' + encodedQuery)
-      .then(response => response.json())
-      .then(json => {
-        console.log(json);
-        setBooks(json.docs || []);
-      })
-      .catch(error => {
-        console.error(error);
-      });
+    (async () => {
+      const encodedQuery = params.query?.replaceAll(' ', '+');
+      const json = await make_req('https://openlibrary.org/search.json?q=' + encodedQuery + '&filters&fields=key,title,author_name,editions,cover_i,first_publish_year');
+      setBooks(json.docs);
+    })();
   }, [params.query]);
-  console.log(books);
 
   return (
     <Box className="flex-1 bg-background-300 h-[100vh] lg:my-24">
