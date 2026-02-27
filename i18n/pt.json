@@ -1,0 +1,76 @@
+{
+  "search": {
+    "placeholder": "Pesquisar livros...",
+    "results": "Resultados da pesquisa ({{count}})",
+    "noResults": "Nenhum resultado encontrado",
+    "newBooks": "Novos Livros",
+    "myBooks": "Meus Livros"
+  },
+  "home": {
+    "empty": "Nenhum livro ainda. Toque em + para adicionar ou pesquisar livros!"
+  },
+  "addBook": {
+    "title": "Adicionar Livro",
+    "coverImage": "Imagem da Capa",
+    "tapToSelect": "Toque para selecionar uma imagem",
+    "bookTitle": "Título",
+    "titlePlaceholder": "Insira o título do livro",
+    "author": "Autor",
+    "authorPlaceholder": "Insira o nome do autor",
+    "saving": "Salvando...",
+    "saveBook": "Salvar Livro",
+    "validation": "Validação",
+    "titleRequired": "O título é obrigatório.",
+    "authorRequired": "O autor é obrigatório.",
+    "error": "Erro",
+    "saveFailed": "Falha ao salvar o livro."
+  },
+  "bookDetail": {
+    "bookNotFound": "Livro não encontrado.",
+    "noCover": "Sem Capa",
+    "rating": "Avaliação",
+    "readDone": "Lido ✓",
+    "markAsRead": "Marcar como Lido",
+    "deleteBook": "Excluir Livro",
+    "deleteTitle": "Excluir Livro",
+    "deleteMessage": "Remover \"{{title}}\" da sua biblioteca?",
+    "cancel": "Cancelar",
+    "delete": "Excluir"
+  },
+  "olBook": {
+    "unknownAuthor": "Autor desconhecido",
+    "adding": "Adicionando...",
+    "addToLibrary": "Adicionar à Minha Biblioteca",
+    "added": "Adicionado",
+    "addedMessage": "\"{{title}}\" foi adicionado à sua biblioteca.",
+    "ok": "OK",
+    "error": "Erro",
+    "addFailed": "Falha ao adicionar o livro.",
+    "andOthers": "e {{count}} outros"
+  },
+  "settings": {
+    "title": "Configurações",
+    "appearance": "Aparência",
+    "darkMode": "Modo Escuro",
+    "language": "Idioma",
+    "english": "Inglês",
+    "portuguese": "Português",
+    "data": "Dados",
+    "exportDatabase": "Exportar Base de Dados",
+    "exportDescription": "Guarde a sua biblioteca como ficheiro para transferir para outro dispositivo.",
+    "exportError": "Falha na Exportação",
+    "exportErrorMessage": "Não foi possível exportar a base de dados.",
+    "importDatabase": "Importar Base de Dados",
+    "importDescription": "Substitua a sua biblioteca por um ficheiro de base de dados exportado anteriormente.",
+    "importConfirmTitle": "Substituir Biblioteca?",
+    "importConfirmMessage": "Isto irá substituir todos os seus livros atuais pela base de dados importada. Esta ação não pode ser desfeita.",
+    "importConfirmButton": "Importar",
+    "importSuccess": "Importação Bem-sucedida",
+    "importSuccessMessage": "Base de dados importada. Reinicie a aplicação para carregar os novos dados.",
+    "importError": "Falha na Importação",
+    "importErrorMessage": "Não foi possível importar a base de dados.",
+    "about": "Sobre",
+    "version": "Versão",
+    "appName": "MyBookShelf"
+  }
+}

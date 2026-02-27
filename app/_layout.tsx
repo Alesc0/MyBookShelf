@@ -1,28 +1,30 @@
-import { Fab } from '@/components/ui/fab';
-import { GluestackUIProvider } from '@/components/ui/gluestack-ui-provider';
-import '@/global.css';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Fab } from "@/components/ui/fab";
+import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
+import { SettingsProvider, useSettings } from "@/components/SettingsContext";
+import { DrizzleProvider } from "@/db/DrizzleProvider";
+import "@/global.css";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
-} from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { Slot, usePathname } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { Plus } from 'lucide-react-native';
-import { useEffect, useState } from 'react';
+} from "@react-navigation/native";
+import { useFonts } from "expo-font";
+import { Slot, usePathname } from "expo-router";
+import * as SplashScreen from "expo-splash-screen";
+import { Plus } from "lucide-react-native";
+import { useEffect, useState } from "react";
 
 export {
   // Catch any errors thrown by the Layout component.
-  ErrorBoundary
-} from 'expo-router';
+  ErrorBoundary,
+} from "expo-router";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     ...FontAwesome.font,
   });
 
@@ -40,24 +42,23 @@ export default function RootLayout() {
 }
 
 function RootLayoutNav() {
+  return (
+    <SettingsProvider>
+      <RootLayoutInner />
+    </SettingsProvider>
+  );
+}
+
+function RootLayoutInner() {
+  const { colorMode } = useSettings();
   const pathname = usePathname();
-  const [colorMode, setColorMode] = useState<'light' | 'dark'>('light');
 
   return (
     <GluestackUIProvider mode={colorMode}>
-      <ThemeProvider value={colorMode === 'dark' ? DarkTheme : DefaultTheme}>
-        <Slot />
-        {/* {pathname === '/' && (
-          <Fab
-            onPress={() =>
-              setColorMode(colorMode === 'dark' ? 'light' : 'dark')
-            }
-            className="m-6"
-            size="lg"
-          >
-            <Plus size={28} color={colorMode === 'dark' ? '#000' : '#FFF'} />
-          </Fab>
-        )} */}
+      <ThemeProvider value={colorMode === "dark" ? DarkTheme : DefaultTheme}>
+        <DrizzleProvider>
+          <Slot />
+        </DrizzleProvider>
       </ThemeProvider>
     </GluestackUIProvider>
   );

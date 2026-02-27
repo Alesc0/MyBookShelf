@@ -1,0 +1,1 @@
+ALTER TABLE `books_table` ADD `coverUri` text;

@@ -4,6 +4,7 @@ export const booksTable = sqliteTable("books_table", {
   id: int().primaryKey({ autoIncrement: true }),
   title: text().notNull(),
   author: text().notNull(),
+  coverUri: text(),
   isRead: int().notNull().default(0),
   rating: int().notNull().default(0),
 });

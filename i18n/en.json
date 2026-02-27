@@ -1,0 +1,76 @@
+{
+  "search": {
+    "placeholder": "Search for books...",
+    "results": "Search results ({{count}})",
+    "noResults": "No results found",
+    "newBooks": "New Books",
+    "myBooks": "My Books"
+  },
+  "home": {
+    "empty": "No books yet. Tap + to add one or search for books!"
+  },
+  "addBook": {
+    "title": "Add a Book",
+    "coverImage": "Cover Image",
+    "tapToSelect": "Tap to select an image",
+    "bookTitle": "Title",
+    "titlePlaceholder": "Enter book title",
+    "author": "Author",
+    "authorPlaceholder": "Enter author name",
+    "saving": "Saving...",
+    "saveBook": "Save Book",
+    "validation": "Validation",
+    "titleRequired": "Title is required.",
+    "authorRequired": "Author is required.",
+    "error": "Error",
+    "saveFailed": "Failed to save book."
+  },
+  "bookDetail": {
+    "bookNotFound": "Book not found.",
+    "noCover": "No Cover",
+    "rating": "Rating",
+    "readDone": "Read ✓",
+    "markAsRead": "Mark as Read",
+    "deleteBook": "Delete Book",
+    "deleteTitle": "Delete Book",
+    "deleteMessage": "Remove \"{{title}}\" from your library?",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "olBook": {
+    "unknownAuthor": "Unknown author",
+    "adding": "Adding...",
+    "addToLibrary": "Add to My Library",
+    "added": "Added",
+    "addedMessage": "\"{{title}}\" has been added to your library.",
+    "ok": "OK",
+    "error": "Error",
+    "addFailed": "Failed to add book.",
+    "andOthers": "and {{count}} others"
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "darkMode": "Dark Mode",
+    "language": "Language",
+    "english": "English",
+    "portuguese": "Portuguese",
+    "data": "Data",
+    "exportDatabase": "Export Database",
+    "exportDescription": "Save your library as a file to transfer to another device.",
+    "exportError": "Export Failed",
+    "exportErrorMessage": "Could not export the database.",
+    "importDatabase": "Import Database",
+    "importDescription": "Replace your library with a previously exported database file.",
+    "importConfirmTitle": "Replace Library?",
+    "importConfirmMessage": "This will replace all your current books with the imported database. This cannot be undone.",
+    "importConfirmButton": "Import",
+    "importSuccess": "Import Successful",
+    "importSuccessMessage": "Database imported. Please restart the app to load the new data.",
+    "importError": "Import Failed",
+    "importErrorMessage": "Could not import the database.",
+    "about": "About",
+    "version": "Version",
+    "appName": "MyBookShelf"
+  }
+}
