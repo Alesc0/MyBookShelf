@@ -33,7 +33,13 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": ["expo-router", "expo-web-browser", "expo-font", "expo-sqlite"],
+    "plugins": [
+      "expo-router",
+      "expo-web-browser",
+      "expo-font",
+      "expo-sqlite",
+      "expo-localization"
+    ],
     "experiments": {
       "typedRoutes": true
     },
