@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "starter-kit-expo",
-    "slug": "starter-kit-expo",
+    "slug": "mybookshelf",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -14,14 +14,19 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.alesc0sorganization.mybookshelf",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.alesc0sorganization.mybookshelf"
     },
     "web": {
       "bundler": "metro",
@@ -36,6 +41,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "a61871ce-95ec-4db5-89c3-6da6f39c315f"
+      }
+    },
+    "owner": "alesc0s-organization"
   }
 }
