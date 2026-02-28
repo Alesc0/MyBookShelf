@@ -1,17 +1,16 @@
-import BookGrid from '@/components/BookGrid';
-import FabMenu from '@/components/Menu';
-import { SearchBar } from '@/components/SearchBar';
-import { Box } from '@/components/ui/box';
-import { HStack } from '@/components/ui/hstack';
-import { Text } from '@/components/ui/text';
-import { getBooks } from '@/db/books';
-import { useDatabase } from '@/db/DrizzleProvider';
-import { Book } from '@/db/schema';
-import i18n from '@/i18n';
-import { useRouter } from 'expo-router';
-import { Settings } from 'lucide-react-native';
-import React, { useCallback, useEffect, useState } from 'react';
-import { Pressable, RefreshControl, ScrollView } from 'react-native';
+import BookGrid from "@/components/BookGrid";
+import FabMenu from "@/components/Menu";
+import { SearchBar } from "@/components/SearchBar";
+import { Box } from "@/components/ui/box";
+import { Text } from "@/components/ui/text";
+import { getBooks } from "@/db/books";
+import { useDatabase } from "@/db/DrizzleProvider";
+import { Book } from "@/db/schema";
+import i18n from "@/i18n";
+import { useRouter } from "expo-router";
+import { Settings } from "lucide-react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { Pressable, RefreshControl, ScrollView } from "react-native";
 
 export default function Home() {
   const db = useDatabase();
@@ -37,7 +36,7 @@ export default function Home() {
   return (
     <Box className="flex-1 bg-background-300 h-[100vh] lg:my-24">
       <ScrollView
-        style={{ height: '100%' }}
+        style={{ height: "100%" }}
         contentContainerStyle={{ flexGrow: 1 }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -47,13 +46,13 @@ export default function Home() {
           <SearchBar
             trailing={
               <Pressable
-                onPress={() => router.push('/settings')}
+                onPress={() => router.push("/settings")}
                 style={{
                   padding: 10,
                   borderRadius: 12,
                   borderWidth: 1,
-                  borderColor: '#d1d5db',
-                  backgroundColor: '#ffffff',
+                  borderColor: "#d1d5db",
+                  backgroundColor: "#ffffff",
                 }}
               >
                 <Settings size={22} color="#374151" />
@@ -75,4 +74,3 @@ export default function Home() {
     </Box>
   );
 }
-

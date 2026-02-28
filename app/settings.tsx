@@ -128,33 +128,32 @@ export default function Settings() {
               <Text size="sm" className="text-typography-500">
                 {i18n.t("settings.exportDescription")}
               </Text>
-              <Button
-                size="lg"
-                variant="outline"
-                onPress={handleExport}
-                isDisabled={exporting}
-              >
-                <Download size={18} color="#6b7280" />
-                <ButtonText className="ml-2">
-                  {exporting ? "..." : i18n.t("settings.exportDatabase")}
-                </ButtonText>
-              </Button>
-            </VStack>
-            <VStack space="sm" className="bg-background-0 rounded-xl p-4">
-              <Text size="sm" className="text-typography-500">
-                {i18n.t("settings.importDescription")}
-              </Text>
-              <Button
-                size="lg"
-                variant="outline"
-                onPress={handleImport}
-                isDisabled={importing}
-              >
-                <Upload size={18} color="#6b7280" />
-                <ButtonText className="ml-2">
-                  {importing ? "..." : i18n.t("settings.importDatabase")}
-                </ButtonText>
-              </Button>
+              <HStack space="sm">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onPress={handleExport}
+                  isDisabled={exporting}
+                  className="flex-1"
+                >
+                  <Download size={18} color="#6b7280" />
+                  <ButtonText className="ml-2">
+                    {exporting ? "..." : i18n.t("settings.export")}
+                  </ButtonText>
+                </Button>
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onPress={handleImport}
+                  isDisabled={importing}
+                  className="flex-1"
+                >
+                  <Upload size={18} color="#6b7280" />
+                  <ButtonText className="ml-2">
+                    {importing ? "..." : i18n.t("settings.import")}
+                  </ButtonText>
+                </Button>
+              </HStack>
             </VStack>
           </VStack>
 
