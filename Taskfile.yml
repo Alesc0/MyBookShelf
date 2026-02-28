@@ -1,0 +1,67 @@
+version: "3"
+
+tasks:
+  default:
+    desc: List all available tasks
+    cmds:
+      - task --list
+
+  install:
+    desc: Install dependencies
+    cmds:
+      - bun install
+
+  start:
+    desc: Start the Expo development server
+    cmds:
+      - bunx expo start
+
+  android:
+    desc: Start the Expo development server targeting Android
+    cmds:
+      - bunx expo start --android
+
+  ios:
+    desc: Start the Expo development server targeting iOS
+    cmds:
+      - bunx expo start --ios
+
+  web:
+    desc: Start the Expo development server targeting Web
+    cmds:
+      - bunx expo start --web
+
+  build:
+    desc: Export the app for web (production)
+    cmds:
+      - bunx expo export --platform web --output-dir dist
+
+  build:preview:
+    desc: Export the app for web (preview)
+    cmds:
+      - bunx expo export --platform web --output-dir dist
+
+  test:
+    desc: Run tests in watch mode
+    cmds:
+      - bunx jest --watchAll
+
+  test:ci:
+    desc: Run tests once (CI mode)
+    cmds:
+      - bunx jest
+
+  db:generate:
+    desc: Generate Drizzle ORM migrations from schema
+    cmds:
+      - bunx drizzle-kit generate
+
+  db:studio:
+    desc: Open Drizzle Studio to inspect the database
+    cmds:
+      - bunx drizzle-kit studio
+
+  lint:
+    desc: Run TypeScript type checking
+    cmds:
+      - bunx tsc --noEmit
