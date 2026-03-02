@@ -1,4 +1,5 @@
 import { BackButton } from "@/components/BackButton";
+import { Badge, BadgeText } from "@/components/ui/badge";
 import { Box } from "@/components/ui/box";
 import { Button, ButtonIcon, ButtonText } from "@/components/ui/button";
 import { Heading } from "@/components/ui/heading";
@@ -116,6 +117,15 @@ export default function BookDetail() {
             <Text size="lg" className="text-typography-600 text-center">
               {book.author}
             </Text>
+            <Badge
+              action={book.isRead ? "success" : "muted"}
+              variant="solid"
+              size="md"
+            >
+              <BadgeText>
+                {book.isRead ? i18n.t("bookDetail.readDone") : i18n.t("bookDetail.unread")}
+              </BadgeText>
+            </Badge>
           </VStack>
 
           {/* Rating */}

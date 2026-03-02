@@ -12,6 +12,7 @@ export function LocalBookCard({ book }: { book: Book; }) {
       author={book.author}
       coverUri={book.coverUri ?? undefined}
       rating={book.rating}
+      isRead={book.isRead === 1}
       onPress={() => router.push(`/book/${book.id}`)}
     />
   );

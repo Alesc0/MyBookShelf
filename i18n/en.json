@@ -4,7 +4,11 @@
     "results": "Search results ({{count}})",
     "noResults": "No results found",
     "newBooks": "New Books",
-    "myBooks": "My Books"
+    "myBooks": "My Books",
+    "myLibrary": "In My Library",
+    "onlineResults": "Online Results",
+    "language": "Language",
+    "anyLanguage": "Any"
   },
   "home": {
     "empty": "No books yet. Tap + to add one or search for books!"
@@ -30,6 +34,7 @@
     "noCover": "No Cover",
     "rating": "Rating",
     "readDone": "Read ✓",
+    "unread": "Unread",
     "markAsRead": "Mark as Read",
     "deleteBook": "Delete Book",
     "deleteTitle": "Delete Book",
@@ -46,7 +51,8 @@
     "ok": "OK",
     "error": "Error",
     "addFailed": "Failed to add book.",
-    "andOthers": "and {{count}} others"
+    "andOthers": "and {{count}} others",
+    "otherCovers": "Other Covers"
   },
   "settings": {
     "title": "Settings",

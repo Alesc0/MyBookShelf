@@ -10,7 +10,7 @@ export type OLBook_Search = {
         key: string;
         title: string;
         cover_i?: string;
-      }
+      },
     ];
   };
 };

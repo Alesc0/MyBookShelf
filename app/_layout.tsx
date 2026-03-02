@@ -1,7 +1,6 @@
-import { Fab } from "@/components/ui/fab";
-import { GluestackUIProvider } from "@/components/ui/gluestack-ui-provider";
-import { SettingsProvider, useSettings } from "@/components/SettingsContext";
-import { DrizzleProvider } from "@/db/DrizzleProvider";
+import {SettingsProvider, useSettings} from "@/components/SettingsContext";
+import {GluestackUIProvider} from "@/components/ui/gluestack-ui-provider";
+import {DrizzleProvider} from "@/db/DrizzleProvider";
 import "@/global.css";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import {
@@ -9,11 +8,10 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
-import { useFonts } from "expo-font";
-import { Slot, usePathname } from "expo-router";
+import {useFonts} from "expo-font";
+import {Slot, usePathname} from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { Plus } from "lucide-react-native";
-import { useEffect, useState } from "react";
+import {useEffect} from "react";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -50,7 +48,7 @@ function RootLayoutNav() {
 }
 
 function RootLayoutInner() {
-  const { colorMode } = useSettings();
+  const {colorMode} = useSettings();
   const pathname = usePathname();
 
   return (

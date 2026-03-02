@@ -4,7 +4,11 @@
     "results": "Resultados da pesquisa ({{count}})",
     "noResults": "Nenhum resultado encontrado",
     "newBooks": "Novos Livros",
-    "myBooks": "Meus Livros"
+    "myBooks": "Meus Livros",
+    "myLibrary": "Na Minha Biblioteca",
+    "onlineResults": "Resultados Online",
+    "language": "Idioma",
+    "anyLanguage": "Qualquer"
   },
   "home": {
     "empty": "Nenhum livro ainda. Toque em + para adicionar ou pesquisar livros!"
@@ -30,6 +34,7 @@
     "noCover": "Sem Capa",
     "rating": "Avaliação",
     "readDone": "Lido ✓",
+    "unread": "Por Ler",
     "markAsRead": "Marcar como Lido",
     "deleteBook": "Excluir Livro",
     "deleteTitle": "Excluir Livro",
@@ -46,7 +51,8 @@
     "ok": "OK",
     "error": "Erro",
     "addFailed": "Falha ao adicionar o livro.",
-    "andOthers": "e {{count}} outros"
+    "andOthers": "e {{count}} outros",
+    "otherCovers": "Outras Capas"
   },
   "settings": {
     "title": "Configurações",
