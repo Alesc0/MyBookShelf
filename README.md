@@ -30,7 +30,7 @@ A personal book library app built with React Native and Expo. Search the Open Li
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) 18+
+- [Node.js](https://nodejs.org/) compatible with the Expo SDK version in `package.json`
 - [Bun](https://bun.sh/) (package manager)
 - [Expo Go](https://expo.dev/go) on your device/emulator
 
@@ -55,8 +55,7 @@ Scan the QR code with Expo Go or press `a` for Android / `i` for iOS.
 ```
 app/                  # Expo Router pages
   _layout.tsx         # Root layout (providers)
-  index.tsx           # Home — book grid
-  search.tsx          # Search with infinite scroll
+  index.tsx           # Library, local suggestions, online search and pagination
   add-book.tsx        # Manual book entry form
   settings.tsx        # Settings (theme, language, data)
   book/[id].tsx       # Local book detail
@@ -65,7 +64,7 @@ components/           # Reusable components
   ui/                 # Gluestack UI primitives
   BookCard.tsx        # Book card dispatcher
   BookGrid.tsx        # Grid layout for books
-  SearchBar.tsx       # Search input with navigation
+  SearchBar.tsx       # Search input and local suggestions
   SettingsContext.tsx  # App settings provider
 db/                   # Database layer
   schema.ts           # Drizzle table definitions
@@ -90,7 +89,11 @@ i18n/                 # Translations
 
 ## CI/CD
 
-The project includes a GitHub Actions workflow (`.github/workflows/main.yml`) that builds an unsigned iOS IPA on demand via `workflow_dispatch`.
+The GitHub Actions workflow (`.github/workflows/main.yml`) builds an unsigned iOS IPA on pushes to `main` and on manual dispatch. It does not run type checking or tests.
+
+## AI-assisted development
+
+Start with [AGENTS.md](AGENTS.md) for repository instructions. The [architecture guide](docs/ai/architecture.md) maps routes, data flows, and known implementation limits. The [development guide](docs/ai/development.md) covers commands, migration changes, and verification.
 
 ## License
 
