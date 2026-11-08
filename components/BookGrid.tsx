@@ -1,21 +1,19 @@
-import { Book } from "@/db/schema";
-import { OLBook_Search } from "./types";
-import { JSX } from "react";
+import { BookItem } from "./types";
 import { BookCard } from "./BookCard";
 import { Grid, GridItem } from "./ui/grid";
-
-type Props = {
-  books: Book[] | OLBook_Search[];
-};
-
-export default function BookGrid({ books }: Props): JSX.Element {
+export default function BookGrid({ books }: { books: BookItem[] }) {
   return (
     <Grid _extra={{ className: "grid-cols-6" }}>
-      {books.map((l, i) => (
-        <GridItem key={i} _extra={{ className: 'col-span-3' }}>
-          <BookCard book={l} />
+      {books.map((item) => (
+        <GridItem
+          key={
+            item.source === "local" ? `local-${item.book.id}` : item.book.key
+          }
+          _extra={{ className: "col-span-3" }}
+        >
+          <BookCard item={item} />
         </GridItem>
       ))}
     </Grid>
-  )
+  );
 }

@@ -8,7 +8,8 @@
     "myLibrary": "In My Library",
     "onlineResults": "Online Results",
     "language": "Language",
-    "anyLanguage": "Any"
+    "anyLanguage": "Any",
+    "moreLocal": "More library matches"
   },
   "home": {
     "empty": "No books yet. Tap + to add one or search for books!"
@@ -27,7 +28,9 @@
     "titleRequired": "Title is required.",
     "authorRequired": "Author is required.",
     "error": "Error",
-    "saveFailed": "Failed to save book."
+    "saveFailed": "Failed to save book.",
+    "imageFailed": "Could not select the image.",
+    "nativeImage": "Use the native app to select a cover from your device."
   },
   "bookDetail": {
     "bookNotFound": "Book not found.",
@@ -40,7 +43,8 @@
     "deleteTitle": "Delete Book",
     "deleteMessage": "Remove \"{{title}}\" from your library?",
     "cancel": "Cancel",
-    "delete": "Delete"
+    "delete": "Delete",
+    "star": "Rate {{count}} stars"
   },
   "olBook": {
     "unknownAuthor": "Unknown author",
@@ -52,7 +56,8 @@
     "error": "Error",
     "addFailed": "Failed to add book.",
     "andOthers": "and {{count}} others",
-    "otherCovers": "Other Covers"
+    "otherCovers": "Other Covers",
+    "coverOption": "Cover {{count}}"
   },
   "settings": {
     "title": "Settings",
@@ -64,21 +69,42 @@
     "data": "Data",
     "exportDatabase": "Export Database",
     "export": "Export",
-    "exportDescription": "Save your library as a file to transfer to another device.",
+    "exportDescription": "Save books and local covers in a portable backup. Settings are excluded. Missing local cover files must be replaced or removed before export.",
     "exportError": "Export Failed",
     "exportErrorMessage": "Could not export the database.",
     "importDatabase": "Import Database",
     "import": "Import",
-    "importDescription": "Replace your library with a previously exported database file.",
+    "importDescription": "Restore a portable backup or a legacy database. Legacy database files do not contain local covers.",
     "importConfirmTitle": "Replace Library?",
-    "importConfirmMessage": "This will replace all your current books with the imported database. This cannot be undone.",
+    "importConfirmMessage": "This replaces your library. A recovery database is retained on this device. Settings stay unchanged.",
     "importConfirmButton": "Import",
     "importSuccess": "Import Successful",
-    "importSuccessMessage": "Database imported. Please restart the app to load the new data.",
+    "importSuccessMessage": "Your library has been restored.",
     "importError": "Import Failed",
     "importErrorMessage": "Could not import the database.",
     "about": "About",
     "version": "Version",
-    "appName": "MyBookShelf"
+    "appName": "MyBookShelf",
+    "storageError": "Could not load or save preferences. Changes may not survive a restart.",
+    "nativeBackup": "Backup import and export are available in the native app."
+  },
+  "common": {
+    "retry": "Retry",
+    "back": "Back",
+    "loadError": "Could not load data. Please retry.",
+    "updateError": "Could not save the change. Please retry.",
+    "databaseError": "Could not open the library.",
+    "webDatabaseError": "Browser storage needs cross-origin isolation. Configure COOP/COEP headers on this host or use the native app."
+  },
+  "languages": {
+    "any": "Any",
+    "eng": "English",
+    "por": "Portuguese",
+    "spa": "Spanish",
+    "fre": "French",
+    "ger": "German",
+    "ita": "Italian",
+    "jpn": "Japanese",
+    "chi": "Chinese"
   }
 }
