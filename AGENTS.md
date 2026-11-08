@@ -21,19 +21,19 @@ MyBookShelf is a personal library app built with Expo SDK 55, React Native 0.83.
 - Use the existing Gluestack primitives in `components/ui/` and NativeWind classes. Prefer semantic colors such as `bg-background-300` and `text-typography-600` for UI that must follow the selected theme.
 - Reuse `BookCardShell`, `LocalBookCard`, and `OLBookCard` for book presentation. Local book rows and Open Library results have different shapes.
 - Add user-facing strings to both `i18n/en.json` and `i18n/pt.json`, with matching keys and interpolation variables. Use `i18n.t(...)` in components.
-- Settings come from `useSettings()`. Locale persists under `app_locale`; color mode currently resets to light when the provider mounts. Do not describe theme persistence as implemented.
+- Settings come from `useSettings()`. Locale persists under `app_locale` and theme under `app_color_mode`; the provider waits for hydration before mounting screens.
 - Respect native and web differences. A successful web bundle does not verify SQLite startup, image pickers, file pickers, or native navigation.
 
 ## Data changes need special care
 
 - Preserve existing libraries. Never delete a database or remove old migrations to make a change pass.
 - Schema changes require Drizzle migration generation and review of SQL, snapshots, journal, and `drizzle/migrations.js` together. See the development guide.
-- The custom migration runner replays every journal entry on startup. It rewrites `CREATE TABLE` and ignores duplicate-column errors, but has no applied-migration ledger. Check repeat launches and upgrades with existing data, especially for data-changing SQL.
-- Export/import copies the SQLite file and stores cover URIs as text. It does not package image files or settings. Imports replace the database and require an app restart. Use disposable data to verify this flow.
+- The custom migration runner tracks successful entries transactionally and baselines the two historical schemas without a ledger. Check repeat launches and upgrades with existing data, especially for data-changing SQL.
+- Native export/import uses versioned database snapshots with local covers, excluding settings. Import validates and stages the library, retains a recovery snapshot, and reloads screens after atomic SQLite publication. Legacy `.db` imports omit local covers. Use disposable data to verify this flow.
 
 ## Before handing off
 
 - Run checks appropriate to the change using the development guide. Do not claim tests, native builds, or device checks passed unless you ran them.
-- No test files are checked in. Jest is configured, and `bun run test` starts watch mode. Use an explicit one-shot command for automation and report a missing test suite honestly.
+- Jest regression tests are checked in. `bun run test` starts watch mode; use `bun run test:ci` for automation. Native picker and filesystem checks still require a device.
 - Keep these docs current when changing routes, persistence, commands, provider wiring, or build behavior.
 - Summarize the behavior changed, checks run, and remaining limitations. Do not commit generated builds, credentials, or personal library files.

@@ -13,8 +13,9 @@ import { useDatabase } from "@/db/DrizzleProvider";
 import { Book } from "@/db/schema";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { Star, Trash2 } from "lucide-react-native";
-import React, { useCallback, useEffect, useState } from "react";
-import { Alert, ScrollView } from "react-native";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { ScrollView, useWindowDimensions } from "react-native";
+import { Alert } from "@/components/alerts";
 import i18n from "@/i18n";
 
 export default function BookDetail() {
@@ -24,43 +25,79 @@ export default function BookDetail() {
   const [book, setBook] = useState<Book | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [error, setError] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const mutation = useRef(false);
+  const width = Math.min(240, useWindowDimensions().width - 48);
   const loadBook = useCallback(async () => {
-    if (!id) return;
-    const result = await getBookById(db, Number(id));
-    setBook(result ?? null);
-    setLoading(false);
+    setLoading(true);
+    try {
+      const numericId = Number(id);
+      if (!id || !Number.isSafeInteger(numericId) || numericId <= 0) {
+        setBook(null);
+        return;
+      }
+      const result = await getBookById(db, numericId);
+      setBook(result ?? null);
+      setError(false);
+    } catch {
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
   }, [db, id]);
-
   useEffect(() => {
-    loadBook();
+    void loadBook();
   }, [loadBook]);
-
-  const handleToggleRead = async () => {
-    if (!book) return;
-    await toggleRead(db, book.id, !book.isRead);
-    await loadBook();
+  const mutate = async (action: () => Promise<void>) => {
+    if (mutation.current) return;
+    mutation.current = true;
+    setBusy(true);
+    try {
+      await action();
+      setError(false);
+    } catch {
+      setError(true);
+    } finally {
+      mutation.current = false;
+      setBusy(false);
+    }
   };
-
-  const handleRating = async (value: number) => {
+  const handleToggleRead = () => {
     if (!book) return;
-    const newRating = book.rating === value ? 0 : value;
-    await setRating(db, book.id, newRating);
-    await loadBook();
+    void mutate(async () => {
+      await toggleRead(db, book.id, !book.isRead);
+      setBook({ ...book, isRead: book.isRead ? 0 : 1 });
+    });
+  };
+  const handleRating = (value: number) => {
+    if (!book) return;
+    const rating = book.rating === value ? 0 : value;
+    void mutate(async () => {
+      await setRating(db, book.id, rating);
+      setBook({ ...book, rating });
+    });
   };
 
   const handleDelete = () => {
-    if (!book) return;
-    Alert.alert(i18n.t("bookDetail.deleteTitle"), i18n.t("bookDetail.deleteMessage", { title: book.title }), [
-      { text: i18n.t("bookDetail.cancel"), style: "cancel" },
-      {
-        text: i18n.t("bookDetail.delete"),
-        style: "destructive",
-        onPress: async () => {
-          await deleteBook(db, book.id);
-          router.back();
+    if (!book || mutation.current) return;
+    Alert.alert(
+      i18n.t("bookDetail.deleteTitle"),
+      i18n.t("bookDetail.deleteMessage", { title: book.title }),
+      [
+        { text: i18n.t("bookDetail.cancel"), style: "cancel" },
+        {
+          text: i18n.t("bookDetail.delete"),
+          style: "destructive",
+          onPress: async () => {
+            await mutate(async () => {
+              await deleteBook(db, book.id);
+              router.back();
+            });
+          },
         },
-      },
-    ]);
+      ],
+    );
   };
 
   if (loading) {
@@ -75,7 +112,14 @@ export default function BookDetail() {
     return (
       <Box className="flex-1 bg-background-300 py-safe p-6">
         <BackButton />
-        <Text className="text-center mt-10">{i18n.t("bookDetail.bookNotFound")}</Text>
+        <Text className="text-center mt-10">
+          {i18n.t(error ? "common.loadError" : "bookDetail.bookNotFound")}
+        </Text>
+        {error && (
+          <Button onPress={loadBook}>
+            <ButtonText>{i18n.t("common.retry")}</ButtonText>
+          </Button>
+        )}
       </Box>
     );
   }
@@ -86,24 +130,31 @@ export default function BookDetail() {
         <VStack space="lg" className="p-6">
           <BackButton />
 
+          {error && (
+            <Text accessibilityRole="alert">
+              {i18n.t("common.updateError")}
+            </Text>
+          )}
           {/* Cover */}
           <Box className="items-center">
             <Box
               className="rounded-lg overflow-hidden"
-              style={{ width: 240, height: 360 }}
+              style={{ width, height: width * 1.5 }}
             >
               {book.coverUri ? (
                 <Image
                   source={{ uri: book.coverUri }}
                   size="full"
                   className="w-full h-full rounded-md"
-                  accessibilityLabel="image"
-                  alt="Book Cover"
+                  accessible={false}
+                  alt=""
                   resizeMode="contain"
                 />
               ) : (
                 <Box className="w-full h-full bg-background-200 items-center justify-center">
-                  <Text className="text-typography-400">{i18n.t("bookDetail.noCover")}</Text>
+                  <Text className="text-typography-400">
+                    {i18n.t("bookDetail.noCover")}
+                  </Text>
                 </Box>
               )}
             </Box>
@@ -123,7 +174,9 @@ export default function BookDetail() {
               size="md"
             >
               <BadgeText>
-                {book.isRead ? i18n.t("bookDetail.readDone") : i18n.t("bookDetail.unread")}
+                {book.isRead
+                  ? i18n.t("bookDetail.readDone")
+                  : i18n.t("bookDetail.unread")}
               </BadgeText>
             </Badge>
           </VStack>
@@ -133,17 +186,25 @@ export default function BookDetail() {
             <Text size="sm" className="text-typography-500">
               {i18n.t("bookDetail.rating")}
             </Text>
-            <HStack space="sm">
+            <HStack style={{ flexWrap: "wrap", justifyContent: "center" }}>
               {[1, 2, 3, 4, 5].map((star) => (
                 <Button
                   key={star}
+                  isDisabled={busy}
+                  accessibilityLabel={i18n.t("bookDetail.star", {
+                    count: star,
+                  })}
+                  accessibilityState={{
+                    selected: star === book.rating,
+                    disabled: busy,
+                  }}
                   variant="link"
                   size="xl"
                   onPress={() => handleRating(star)}
                   style={{ padding: 8 }}
                 >
                   <Star
-                    size={36}
+                    size={28}
                     color={star <= book.rating ? "#f59e0b" : "#9ca3af"}
                     fill={star <= book.rating ? "#f59e0b" : "none"}
                   />
@@ -156,9 +217,15 @@ export default function BookDetail() {
           <Button
             size="lg"
             variant={book.isRead ? "solid" : "outline"}
+            isDisabled={busy}
+            accessibilityState={{ selected: !!book.isRead, disabled: busy }}
             onPress={handleToggleRead}
           >
-            <ButtonText>{book.isRead ? i18n.t("bookDetail.readDone") : i18n.t("bookDetail.markAsRead")}</ButtonText>
+            <ButtonText>
+              {book.isRead
+                ? i18n.t("bookDetail.readDone")
+                : i18n.t("bookDetail.markAsRead")}
+            </ButtonText>
           </Button>
 
           {/* Delete */}
@@ -166,6 +233,7 @@ export default function BookDetail() {
             size="lg"
             variant="outline"
             action="negative"
+            isDisabled={busy}
             onPress={handleDelete}
           >
             <ButtonIcon as={Trash2} className="mr-2" />

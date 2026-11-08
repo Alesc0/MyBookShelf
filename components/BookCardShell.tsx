@@ -1,14 +1,14 @@
-import {Badge, BadgeText} from "@/components/ui/badge";
-import {HStack} from "@/components/ui/hstack";
+import { Badge, BadgeText } from "@/components/ui/badge";
+import { HStack } from "@/components/ui/hstack";
 import i18n from "@/i18n";
-import {Star} from "lucide-react-native";
+import { Star } from "lucide-react-native";
 import React from "react";
-import {Pressable} from "react-native";
-import {Box} from "./ui/box";
-import {Card} from "./ui/card";
-import {Image} from "./ui/image";
-import {Text} from "./ui/text";
-import {VStack} from "./ui/vstack";
+import { Pressable } from "react-native";
+import { Box } from "./ui/box";
+import { Card } from "./ui/card";
+import { Image } from "./ui/image";
+import { Text } from "./ui/text";
+import { VStack } from "./ui/vstack";
 
 export function BookCardShell({
   title,
@@ -28,31 +28,37 @@ export function BookCardShell({
   onPress?: () => void;
 }) {
   return (
-    <Pressable onPress={onPress}>
-      <Card size="lg" variant="elevated" className="m-3 p-2 w-fit flex flex-col">
-        <Box className="h-80">
+    <Pressable accessibilityRole="button" onPress={onPress}>
+      <Card
+        size="lg"
+        variant="elevated"
+        className="m-3 p-2 w-fit flex flex-col"
+      >
+        <Box style={{ width: "100%", aspectRatio: 2 / 3, maxHeight: 320 }}>
           {coverUri ? (
             <Image
-              source={{uri: coverUri}}
+              source={{ uri: coverUri }}
               size="full"
               className="w-full h-full rounded-md"
-              accessibilityLabel="image"
-              alt="Book Cover"
+              accessible={false}
+              alt=""
               resizeMode="contain"
             />
           ) : (
             <Box className="w-full h-full rounded-md bg-background-200 items-center justify-center">
-              <Text className="text-typography-400">{i18n.t("bookDetail.noCover")}</Text>
+              <Text className="text-typography-400">
+                {i18n.t("bookDetail.noCover")}
+              </Text>
             </Box>
           )}
         </Box>
 
-        <VStack space="sm" style={{alignItems: "center"}} className="my-2">
-          <Text size="xl" bold={true} style={{textAlign: "center"}}>
+        <VStack space="sm" style={{ alignItems: "center" }} className="my-2">
+          <Text size="xl" bold={true} style={{ textAlign: "center" }}>
             {title}
             {year ? ` (${year})` : ""}
           </Text>
-          <Text size="md" style={{textAlign: "center"}}>
+          <Text size="md" style={{ textAlign: "center" }}>
             {author}
           </Text>
 
@@ -69,9 +75,15 @@ export function BookCardShell({
             </HStack>
           )}
           {isRead != null && (
-            <Badge action={isRead ? "success" : "muted"} variant="solid" size="sm">
+            <Badge
+              action={isRead ? "success" : "muted"}
+              variant="solid"
+              size="sm"
+            >
               <BadgeText>
-                {isRead ? i18n.t("bookDetail.readDone") : i18n.t("bookDetail.unread")}
+                {isRead
+                  ? i18n.t("bookDetail.readDone")
+                  : i18n.t("bookDetail.unread")}
               </BadgeText>
             </Badge>
           )}

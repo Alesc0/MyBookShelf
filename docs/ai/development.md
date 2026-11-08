@@ -4,7 +4,7 @@ Read [AGENTS.md](../../AGENTS.md) for repository instructions and [architecture.
 
 ## Local setup
 
-Use Bun as the package manager and a Node.js runtime compatible with the Expo version declared in `package.json`. Neither runtime has a repository version pin. `bun.lock` is the dependency lockfile; `.npmrc` contains `legacy-peer-deps=true` for npm compatibility.
+Use Bun as the package manager and a Node.js runtime compatible with the Expo version declared in `package.json`. Node is pinned in `.node-version`, and Bun 1.3.10 is pinned in `package.json` and CI. `bun.lock` is the dependency lockfile; `.npmrc` contains `legacy-peer-deps=true` for npm compatibility.
 
 ```sh
 bun install --frozen-lockfile
@@ -23,11 +23,11 @@ Use an Expo-compatible device client or emulator for native checks. iOS simulato
 | Export web | `bun run build` | Writes ignored `dist/`; `build:preview` is identical |
 | Check TypeScript | `bunx tsc --noEmit` | Also `task lint`; no separate ESLint configuration/script |
 | Watch tests | `bun run test` | Jest with `jest-expo` preset |
-| Run tests once | `bunx jest --watch=false --runInBand` | No tests are currently checked in; do not hide this with `--passWithNoTests` |
+| Run tests once | `bunx jest --watch=false --runInBand` | Regression suites cover migration upgrades/rollback, backup validation/publication ordering, search races/failures, requests, and preference persistence |
 | Generate migrations | `bunx drizzle-kit generate` | Also `task db:generate`; writes files under `drizzle/` |
 | Open Drizzle Studio | `bunx drizzle-kit studio` | Also `task db:studio`; inspect Expo driver requirements before relying on it for device data |
 
-There is no `bun run lint`, `bun run typecheck`, or `bun run test:ci` script. `task test:ci` calls `bunx jest`. Use package scripts or direct commands if Go Task is unavailable. Do not use Bun's built-in test runner as a substitute for the configured Jest suite.
+Use `bun run typecheck` and `bun run test:ci` for one-shot checks. `task test:ci` calls the latter. There is no `bun run lint` script. Use package scripts or direct commands if Go Task is unavailable. Do not use Bun's built-in test runner as a substitute for the configured Jest suite.
 
 ## Choose verification for the change
 
@@ -46,7 +46,7 @@ If a command fails on the unmodified project, record the error separately from e
 5. Check Babel's SQL inlining and Metro bundling if migration loading changed.
 6. Test a fresh database and an upgrade with existing rows. Restart again to test replay. Verify retained titles, covers, ratings, and read flags.
 
-The runner does not track completed migrations. Data-changing or destructive statements may repeat at every launch, and failures may leave earlier statements applied. Resolve that risk as part of a schema change rather than assuming standard Drizzle migration tracking exists.
+The custom runner records completed migrations and commits pending SQL plus ledger entries in one transaction. Test both ledger-free historical schemas and second launches. Generated rebuild SQL must select NULL for newly introduced columns that are absent from the old table. Invalid historical values must roll back without losing rows.
 
 ## Manual checks by feature
 
@@ -60,17 +60,19 @@ Use a disposable library for changes involving import, deletion, or migrations. 
 | Search | Local suggestions, submit, local and online sections, collapse/expand, next page, language filter, clear/back, no results |
 | Network changes | Offline/rejected requests, rapid consecutive queries, absent authors/covers, no duplicate pagination requests |
 | Online detail | Alternate covers, no editions/covers, selected cover retained when adding, local row after refresh |
-| Settings | Both languages, matching translations, light/dark controls, locale after restart, theme reset behavior |
-| Backup | Export and cancel; import and cancel; confirm replacement on disposable data; restart and verify rows; check local cover availability separately |
+| Settings | Both languages, matching translations, light/dark controls, locale after restart, persisted theme and storage-error retry |
+| Backup | Export and cancel; import and cancel; confirm replacement on disposable data; verify immediate row reload, retained recovery snapshot, portable local covers, invalid/future schema rejection, and failed-publication recovery |
 | Web | Library/SQLite startup in browser, route navigation, layout, console errors, production hosting headers |
 | Native | Keyboard/safe area, navigation, image permission/picker, file/directory pickers on the platform affected |
 
 ## Builds and CI
 
-[.github/workflows/main.yml](../../.github/workflows/main.yml) runs on manual dispatch and pushes to `main`. On `macos-15` it installs with Bun's frozen lockfile, runs a clean iOS prebuild and CocoaPods, archives with signing disabled, and uploads an unsigned IPA. It does not run TypeScript checks or Jest. An uploaded IPA is not evidence that automated tests passed or that App Store distribution is configured.
+[.github/workflows/main.yml](../../.github/workflows/main.yml) runs on manual dispatch and pushes to `main`. On `macos-15` it installs with Bun's frozen lockfile, runs a clean iOS prebuild and CocoaPods, archives with signing disabled, and uploads an unsigned IPA. The separate `checks.yml` workflow runs frozen Bun installation, TypeScript, one-shot Jest, and web export on pull requests and main pushes. An uploaded IPA is not evidence that automated tests passed or that App Store distribution is configured.
 
 `eas.json` defines development, preview, and production build profiles and a production submit entry. Treat submitting or publishing as a separate action from local verification. A clean Expo prebuild regenerates native projects; review local native changes before running it.
 
 ## Keeping AI context useful
 
 When changing behavior, update the relevant section here or in the architecture guide with concrete file references. Keep durable instructions in `AGENTS.md`; put detailed implementation context in `docs/ai/`. Distinguish observed limitations from intended behavior and avoid recording unverified fixes as facts.
+
+Browser runtime checks require COOP/COEP headers, including on production exports. See `public/_headers`. Web backup and image selection intentionally require the native app. Jest uses Node's real SQLite for migration tests and mocks the native backup boundary; it does not prove native file pickers or cross-device filesystem behavior. Use a disposable library on a device for those checks.

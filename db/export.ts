@@ -1,69 +1,149 @@
 import { Directory, File, Paths } from "expo-file-system";
+import * as SQLite from "expo-sqlite";
+import { Platform } from "react-native";
+import {
+  Backup,
+  bytes,
+  decodeBackup,
+  restoreDatabase,
+  validateDatabase,
+} from "./backup";
 
-const DB_NAME = "books.db";
-const DB_DIR = new Directory(Paths.document, "SQLite");
-const DB_FILE = new File(DB_DIR, DB_NAME);
-
-/**
- * Export the SQLite database file.
- * Lets the user pick a destination directory, then copies the DB there
- * with a timestamped filename.
- */
-export async function exportDatabase(): Promise<void> {
-  // Stage a cache copy so we can read its bytes
-  const cacheDir = new Directory(Paths.cache);
-  const stagedFile = new File(cacheDir, DB_NAME);
-  if (stagedFile.exists) stagedFile.delete();
-  DB_FILE.copy(cacheDir);
-
-  const exportFileName = `MyBookShelf_${new Date().toISOString().replace(/[:.]/g, "-")}.db`;
-
-  // Let the user pick a destination directory
-  const pickedDir = await Directory.pickDirectoryAsync();
-
-  // Create the target file in the chosen directory and write the DB bytes
-  const destFile = pickedDir.createFile(
-    exportFileName,
-    "application/x-sqlite3",
-  );
-  const data = await stagedFile.base64();
-  destFile.write(data, { encoding: "base64" });
-
-  // Clean up staged file
-  if (stagedFile.exists) stagedFile.delete();
+async function pickOrCancel<T>(pick: () => Promise<T>): Promise<T | null> {
+  try {
+    return await pick();
+  } catch (error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      (error.code === "ERR_PICKER_CANCELLED" ||
+        error.code === "ERR_FILE_PICKING_CANCELLED")
+    )
+      return null;
+    throw error;
+  }
 }
 
-/**
- * Import a database file picked by the user.
- * Replaces the current database.
- * Returns true if a file was selected and imported, false if cancelled.
- */
-export async function importDatabase(): Promise<boolean> {
-  const pickedFile = await File.pickFileAsync(
-    undefined,
-    "application/octet-stream",
-  );
-
-  // pickFileAsync returns a single File (or array); handle cancellation
-  if (!pickedFile) {
-    return false;
+let busy = false;
+async function exclusive<T>(action: () => Promise<T>): Promise<T> {
+  if (Platform.OS === "web") throw new Error("Backups require the native app");
+  if (busy) throw new Error("Backup already running");
+  busy = true;
+  try {
+    return await action();
+  } finally {
+    busy = false;
   }
-
-  // Ensure the SQLite directory exists
-  if (!DB_DIR.exists) {
-    DB_DIR.create({ intermediates: true });
-  }
-
-  // Remove old DB so we can replace it
-  if (DB_FILE.exists) {
-    DB_FILE.delete();
-  }
-
-  // Read picked file as base64 and write to the DB location
-  const picked = Array.isArray(pickedFile) ? pickedFile[0] : pickedFile;
-  const data = await picked.base64();
-  DB_FILE.create();
-  DB_FILE.write(data, { encoding: "base64" });
-
-  return true;
+}
+export function exportDatabase(
+  connection: SQLite.SQLiteDatabase,
+): Promise<void> {
+  return exclusive(async () => {
+    const snapshot = SQLite.openDatabaseSync(":memory:", {
+      useNewConnection: true,
+    });
+    try {
+      // Back up to a memory database before serializing, including committed WAL pages.
+      SQLite.backupDatabaseSync({
+        sourceDatabase: connection,
+        destDatabase: snapshot,
+      });
+      const database = snapshot.serializeSync();
+      const covers: Backup["covers"] = [];
+      for (const { coverUri } of snapshot.getAllSync<{ coverUri: string }>(
+        "SELECT DISTINCT coverUri FROM books_table WHERE coverUri IS NOT NULL",
+      )) {
+        if (/^https?:/.test(coverUri)) continue;
+        // Fail explicitly rather than claim that a backup with missing images is portable.
+        covers.push({
+          uri: coverUri,
+          bytes: Array.from(new File(coverUri).bytesSync()),
+        });
+      }
+      const backup: Backup = {
+        format: "MyBookShelf",
+        version: 1,
+        settings: false,
+        database: Array.from(database),
+        covers,
+      };
+      const dir = await pickOrCancel(() => Directory.pickDirectoryAsync());
+      if (!dir) return;
+      const file = dir.createFile(
+        `MyBookShelf_${Date.now()}.bookshelf`,
+        "application/json",
+      );
+      try {
+        file.write(JSON.stringify(backup));
+      } catch (error) {
+        if (file.exists) file.delete();
+        throw error;
+      }
+    } finally {
+      snapshot.closeSync();
+    }
+  });
+}
+export function importDatabase(
+  connection: SQLite.SQLiteDatabase,
+  reload: () => void,
+): Promise<boolean> {
+  return exclusive(async () => {
+    const picked = await pickOrCancel(() => File.pickFileAsync());
+    if (!picked || (Array.isArray(picked) && !picked.length)) return false;
+    const file = Array.isArray(picked) ? picked[0] : picked;
+    const decoded = decodeBackup(await file.bytes());
+    const staged = SQLite.deserializeDatabaseSync(decoded.database, {
+      useNewConnection: true,
+    });
+    const coverDir = new Directory(
+      Paths.document,
+      `covers/import-${Date.now()}-${Math.random().toString(36).slice(2)}`,
+    );
+    let committed = false;
+    try {
+      validateDatabase(staged);
+      coverDir.create({ intermediates: true });
+      const importedUris = new Set<string>();
+      for (const { uri, bytes: data } of decoded.covers) {
+        const target = new File(
+          coverDir,
+          `${Math.random().toString(36).slice(2)}.jpg`,
+        );
+        target.write(bytes(data));
+        importedUris.add(target.uri);
+        staged.runSync(
+          "UPDATE books_table SET coverUri = ? WHERE coverUri = ?",
+          target.uri,
+          uri,
+        );
+      }
+      // A legacy .db cannot carry images. Do not retain device-specific dangling URIs.
+      const rows = staged.getAllSync<{ id: number; coverUri: string }>(
+        "SELECT id, coverUri FROM books_table WHERE coverUri IS NOT NULL",
+      );
+      for (const row of rows)
+        if (!/^https?:/.test(row.coverUri) && !importedUris.has(row.coverUri))
+          staged.runSync(
+            "UPDATE books_table SET coverUri = NULL WHERE id = ?",
+            row.id,
+          );
+      const recovery = SQLite.openDatabaseSync("books-recovery.db", {
+        useNewConnection: true,
+      });
+      try {
+        // This synchronous section prevents JS reads/writes from interleaving with publication.
+        restoreDatabase(connection, staged, recovery);
+        committed = true;
+      } finally {
+        recovery.closeSync();
+      }
+      reload();
+      return true;
+    } finally {
+      staged.closeSync();
+      if (!committed && coverDir.exists) coverDir.delete();
+    }
+  });
 }

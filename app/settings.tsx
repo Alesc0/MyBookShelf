@@ -9,17 +9,30 @@ import { Switch } from "@/components/ui/switch";
 import { Text } from "@/components/ui/text";
 import { VStack } from "@/components/ui/vstack";
 import { exportDatabase, importDatabase } from "@/db/export";
+import { Alert } from "@/components/alerts";
 import i18n from "@/i18n";
+import { useDatabaseStore } from "@/db/DrizzleProvider";
+import Constants from "expo-constants";
 import { Download, Moon, Sun, Upload } from "lucide-react-native";
-import React, { useState } from "react";
-import { Alert, ScrollView } from "react-native";
+import React, { useRef, useState } from "react";
+import { Platform, ScrollView } from "react-native";
 
 export default function Settings() {
-  const { colorMode, toggleColorMode, locale, setLocale } = useSettings();
+  const {
+    colorMode,
+    toggleColorMode,
+    locale,
+    setLocale,
+    storageError,
+    retryStorage,
+  } = useSettings();
+  const { connection, reload } = useDatabaseStore();
+  const busy = useRef(false);
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
 
   const handleImport = () => {
+    if (busy.current) return;
     Alert.alert(
       i18n.t("settings.importConfirmTitle"),
       i18n.t("settings.importConfirmMessage"),
@@ -29,9 +42,11 @@ export default function Settings() {
           text: i18n.t("settings.importConfirmButton"),
           style: "destructive",
           onPress: async () => {
+            if (busy.current) return;
+            busy.current = true;
             setImporting(true);
             try {
-              const picked = await importDatabase();
+              const picked = await importDatabase(connection, reload);
               if (picked) {
                 Alert.alert(
                   i18n.t("settings.importSuccess"),
@@ -45,6 +60,7 @@ export default function Settings() {
               );
               console.log(error);
             } finally {
+              busy.current = false;
               setImporting(false);
             }
           },
@@ -54,9 +70,11 @@ export default function Settings() {
   };
 
   const handleExport = async () => {
+    if (busy.current) return;
+    busy.current = true;
     setExporting(true);
     try {
-      await exportDatabase();
+      await exportDatabase(connection);
     } catch (error) {
       Alert.alert(
         i18n.t("settings.exportError"),
@@ -64,6 +82,7 @@ export default function Settings() {
       );
       console.log(error);
     } finally {
+      busy.current = false;
       setExporting(false);
     }
   };
@@ -75,6 +94,16 @@ export default function Settings() {
           <BackButton />
           <Heading size="2xl">{i18n.t("settings.title")}</Heading>
 
+          {storageError && (
+            <Box>
+              <Text accessibilityRole="alert">
+                {i18n.t("settings.storageError")}
+              </Text>
+              <Button onPress={retryStorage}>
+                <ButtonText>{i18n.t("common.retry")}</ButtonText>
+              </Button>
+            </Box>
+          )}
           {/* Appearance */}
           <VStack space="md">
             <Heading size="lg">{i18n.t("settings.appearance")}</Heading>
@@ -88,6 +117,7 @@ export default function Settings() {
                 <Text size="lg">{i18n.t("settings.darkMode")}</Text>
               </HStack>
               <Switch
+                accessibilityLabel={i18n.t("settings.darkMode")}
                 value={colorMode === "dark"}
                 onValueChange={toggleColorMode}
               />
@@ -124,6 +154,9 @@ export default function Settings() {
           {/* Data */}
           <VStack space="md">
             <Heading size="lg">{i18n.t("settings.data")}</Heading>
+            {Platform.OS === "web" && (
+              <Text>{i18n.t("settings.nativeBackup")}</Text>
+            )}
             <VStack space="sm" className="bg-background-0 rounded-xl p-4">
               <Text size="sm" className="text-typography-500">
                 {i18n.t("settings.exportDescription")}
@@ -133,7 +166,7 @@ export default function Settings() {
                   size="lg"
                   variant="outline"
                   onPress={handleExport}
-                  isDisabled={exporting}
+                  isDisabled={exporting || importing || Platform.OS === "web"}
                   className="flex-1"
                 >
                   <Download size={18} color="#6b7280" />
@@ -145,7 +178,7 @@ export default function Settings() {
                   size="lg"
                   variant="outline"
                   onPress={handleImport}
-                  isDisabled={importing}
+                  isDisabled={exporting || importing || Platform.OS === "web"}
                   className="flex-1"
                 >
                   <Upload size={18} color="#6b7280" />
@@ -166,7 +199,7 @@ export default function Settings() {
               <HStack className="items-center justify-between">
                 <Text size="lg">{i18n.t("settings.appName")}</Text>
                 <Text size="sm" className="text-typography-500">
-                  {i18n.t("settings.version")} 1.0.0
+                  {i18n.t("settings.version")} {Constants.expoConfig?.version}
                 </Text>
               </HStack>
             </Box>

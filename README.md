@@ -89,7 +89,15 @@ i18n/                 # Translations
 
 ## CI/CD
 
-The GitHub Actions workflow (`.github/workflows/main.yml`) builds an unsigned iOS IPA on pushes to `main` and on manual dispatch. It does not run type checking or tests.
+The GitHub Actions workflow (`.github/workflows/main.yml`) builds an unsigned iOS IPA on pushes to `main` and on manual dispatch. The pull-request checks workflow runs TypeScript, regression tests, and web export with pinned Node/Bun versions.
+
+## Backup and web support
+
+Native `.bookshelf` backups include a consistent SQLite snapshot and local cover files. They exclude settings. Remote covers remain URLs. Export fails if a referenced local image is missing. Import validates before publication, retains `books-recovery.db` on the device, and reloads the library immediately. Legacy `.db` imports remain supported, but device-local cover links are cleared because those files do not carry images. Keep old cover files while the recovery database may still need them.
+
+Web supports library browsing, manual entry without device covers, ratings, reading status, deletion, and search. Device image selection and backups require the native app. Production hosting must send `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp` for browser SQLite. `public/_headers` works on hosts that support that convention; configure other hosts explicitly. A successful static export does not establish device support.
+
+Books retain optional Open Library catalog keys and full author strings. Multiple copies of the same catalog work are allowed. Library and local search results load in pages of 40, sorted by title then ID. Search treats `%` and `_` literally.
 
 ## AI-assisted development
 

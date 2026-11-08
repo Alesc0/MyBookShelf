@@ -1,11 +1,11 @@
-import {Book} from "@/db/schema";
+import { Book } from "@/db/schema";
 import i18n from "@/i18n";
-import React, {useEffect, useRef, useState} from "react";
-import {TouchableOpacity, View} from "react-native";
-import {SearchIcon} from "@/components/ui/icon";
-import {Input, InputField, InputIcon, InputSlot} from "@/components/ui/input";
-import {Box} from "@/components/ui/box";
-import {Text} from "@/components/ui/text";
+import React, { useEffect, useRef, useState } from "react";
+import { ScrollView, TouchableOpacity, View } from "react-native";
+import { SearchIcon } from "@/components/ui/icon";
+import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
+import { Box } from "@/components/ui/box";
+import { Text } from "@/components/ui/text";
 
 interface SearchBarProps {
   trailing?: React.ReactNode;
@@ -35,15 +35,22 @@ export function SearchBar({
     if (value !== undefined) setQuery(value);
   }, [value]);
 
+  useEffect(
+    () => () => {
+      if (blurTimerRef.current) clearTimeout(blurTimerRef.current);
+    },
+    [],
+  );
+
   const handleChangeText = (text: string) => {
     setQuery(text);
     onChangeText?.(text);
   };
 
   return (
-    <Box className="w-full px-4 pt-2 flex-row items-center" style={{gap: 8}}>
+    <Box className="w-full px-4 pt-2 flex-row items-center" style={{ gap: 8 }}>
       {leading}
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         <Input
           size="lg"
           variant="outline"
@@ -53,6 +60,11 @@ export function SearchBar({
             <InputIcon as={SearchIcon} />
           </InputSlot>
           <InputField
+            aria-label={i18n.t("search.placeholder")}
+            accessibilityLabel={i18n.t("search.placeholder")}
+            onFocus={() => {
+              if (blurTimerRef.current) clearTimeout(blurTimerRef.current);
+            }}
             placeholder={i18n.t("search.placeholder")}
             value={query}
             onChangeText={handleChangeText}
@@ -62,12 +74,14 @@ export function SearchBar({
               if (onSearch && trimmed !== "") onSearch(trimmed);
             }}
             onBlur={() => {
+              if (blurTimerRef.current) clearTimeout(blurTimerRef.current);
               blurTimerRef.current = setTimeout(() => onBlur?.(), 150);
             }}
           />
         </Input>
         {suggestions && suggestions.length > 0 && (
           <View
+            className="bg-background-0 border-outline-300"
             style={{
               position: "absolute",
               top: "100%",
@@ -75,39 +89,47 @@ export function SearchBar({
               right: 0,
               zIndex: 999,
               elevation: 10,
-              backgroundColor: "#ffffff",
               borderRadius: 12,
               borderWidth: 1,
-              borderColor: "#e5e7eb",
               shadowColor: "#000",
-              shadowOffset: {width: 0, height: 2},
+              shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.12,
               shadowRadius: 8,
               maxHeight: 280,
               overflow: "hidden",
             }}
           >
-            {suggestions.map((book, idx) => (
-              <TouchableOpacity
-                key={book.id}
-                onPress={() => {
-                  if (blurTimerRef.current) clearTimeout(blurTimerRef.current);
-                  onSuggestionSelect?.(book);
-                }}
-                style={{
-                  padding: 12,
-                  borderBottomWidth: idx < suggestions.length - 1 ? 1 : 0,
-                  borderBottomColor: "#f3f4f6",
-                }}
-              >
-                <Text className="text-typography-900 font-medium" numberOfLines={1}>
-                  {book.title}
-                </Text>
-                <Text className="text-typography-400 text-sm" numberOfLines={1}>
-                  {book.author}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            <ScrollView keyboardShouldPersistTaps="handled">
+              {suggestions.map((book, idx) => (
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  key={book.id}
+                  onPress={() => {
+                    if (blurTimerRef.current)
+                      clearTimeout(blurTimerRef.current);
+                    onSuggestionSelect?.(book);
+                  }}
+                  style={{
+                    padding: 12,
+                    borderBottomWidth: idx < suggestions.length - 1 ? 1 : 0,
+                    borderBottomColor: "#f3f4f6",
+                  }}
+                >
+                  <Text
+                    className="text-typography-900 font-medium"
+                    numberOfLines={1}
+                  >
+                    {book.title}
+                  </Text>
+                  <Text
+                    className="text-typography-400 text-sm"
+                    numberOfLines={1}
+                  >
+                    {book.author}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
           </View>
         )}
       </View>

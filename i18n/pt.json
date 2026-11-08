@@ -8,7 +8,8 @@
     "myLibrary": "Na Minha Biblioteca",
     "onlineResults": "Resultados Online",
     "language": "Idioma",
-    "anyLanguage": "Qualquer"
+    "anyLanguage": "Qualquer",
+    "moreLocal": "Mais resultados da biblioteca"
   },
   "home": {
     "empty": "Nenhum livro ainda. Toque em + para adicionar ou pesquisar livros!"
@@ -27,7 +28,9 @@
     "titleRequired": "O título é obrigatório.",
     "authorRequired": "O autor é obrigatório.",
     "error": "Erro",
-    "saveFailed": "Falha ao salvar o livro."
+    "saveFailed": "Falha ao salvar o livro.",
+    "imageFailed": "Não foi possível selecionar a imagem.",
+    "nativeImage": "Use a aplicação nativa para selecionar uma capa do dispositivo."
   },
   "bookDetail": {
     "bookNotFound": "Livro não encontrado.",
@@ -40,7 +43,8 @@
     "deleteTitle": "Excluir Livro",
     "deleteMessage": "Remover \"{{title}}\" da sua biblioteca?",
     "cancel": "Cancelar",
-    "delete": "Excluir"
+    "delete": "Excluir",
+    "star": "Avaliar com {{count}} estrelas"
   },
   "olBook": {
     "unknownAuthor": "Autor desconhecido",
@@ -52,7 +56,8 @@
     "error": "Erro",
     "addFailed": "Falha ao adicionar o livro.",
     "andOthers": "e {{count}} outros",
-    "otherCovers": "Outras Capas"
+    "otherCovers": "Outras Capas",
+    "coverOption": "Capa {{count}}"
   },
   "settings": {
     "title": "Configurações",
@@ -64,21 +69,42 @@
     "data": "Dados",
     "exportDatabase": "Exportar Base de Dados",
     "export": "Exportar",
-    "exportDescription": "Guarde a sua biblioteca como ficheiro para transferir para outro dispositivo.",
+    "exportDescription": "Guarde livros e capas locais numa cópia de segurança portátil. As preferências ficam excluídas. Substitua ou remova capas locais em falta antes de exportar.",
     "exportError": "Falha na Exportação",
     "exportErrorMessage": "Não foi possível exportar a base de dados.",
     "importDatabase": "Importar Base de Dados",
     "import": "Importar",
-    "importDescription": "Substitua a sua biblioteca por um ficheiro de base de dados exportado anteriormente.",
+    "importDescription": "Restaure uma cópia de segurança portátil ou uma base de dados antiga. Os ficheiros antigos não contêm capas locais.",
     "importConfirmTitle": "Substituir Biblioteca?",
-    "importConfirmMessage": "Isto irá substituir todos os seus livros atuais pela base de dados importada. Esta ação não pode ser desfeita.",
+    "importConfirmMessage": "Isto substitui a biblioteca. Uma base de dados de recuperação fica guardada neste dispositivo. As preferências mantêm-se.",
     "importConfirmButton": "Importar",
     "importSuccess": "Importação Bem-sucedida",
-    "importSuccessMessage": "Base de dados importada. Reinicie a aplicação para carregar os novos dados.",
+    "importSuccessMessage": "A biblioteca foi restaurada.",
     "importError": "Falha na Importação",
     "importErrorMessage": "Não foi possível importar a base de dados.",
     "about": "Sobre",
     "version": "Versão",
-    "appName": "MyBookShelf"
+    "appName": "MyBookShelf",
+    "storageError": "Não foi possível carregar ou guardar as preferências. As alterações podem perder-se ao reiniciar.",
+    "nativeBackup": "A importação e exportação de cópias de segurança estão disponíveis na aplicação nativa."
+  },
+  "common": {
+    "retry": "Tentar novamente",
+    "back": "Voltar",
+    "loadError": "Não foi possível carregar os dados. Tente novamente.",
+    "updateError": "Não foi possível guardar a alteração. Tente novamente.",
+    "databaseError": "Não foi possível abrir a biblioteca.",
+    "webDatabaseError": "O armazenamento no navegador requer isolamento de origem. Configure os cabeçalhos COOP/COEP neste servidor ou use a aplicação nativa."
+  },
+  "languages": {
+    "any": "Qualquer",
+    "eng": "Inglês",
+    "por": "Português",
+    "spa": "Espanhol",
+    "fre": "Francês",
+    "ger": "Alemão",
+    "ita": "Italiano",
+    "jpn": "Japonês",
+    "chi": "Chinês"
   }
 }

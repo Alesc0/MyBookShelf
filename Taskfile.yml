@@ -49,7 +49,7 @@ tasks:
   test:ci:
     desc: Run tests once (CI mode)
     cmds:
-      - bunx jest
+      - bun run test:ci
 
   db:generate:
     desc: Generate Drizzle ORM migrations from schema
